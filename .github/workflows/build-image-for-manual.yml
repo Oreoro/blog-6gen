@@ -61,5 +61,5 @@ jobs:
         platforms: linux/amd64,linux/arm64
         push: true
         file: ./Dockerfile
-        tags: apache/answer:${{ inputs.tag_name }}
+        tags: oreoro/answer:${{ inputs.tag_name }}
         labels: ${{ steps.meta.outputs.labels }}

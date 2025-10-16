@@ -1,30 +1,14 @@
 # Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
+# or more contributor license agreements...
 
 FROM golang:1.23-alpine AS golang-builder
 LABEL maintainer="linkinstar@apache.org"
 
 ARG GOPROXY
-# ENV GOPROXY ${GOPROXY:-direct}
-# ENV GOPROXY=https://proxy.golang.com.cn,direct
 
 ENV GOPATH /go
 ENV GOROOT /usr/local/go
-ENV PACKAGE github.com/apache/answer
+ENV PACKAGE github.com/oreoro/blog-6gen
 ENV BUILD_DIR ${GOPATH}/src/${PACKAGE}
 ENV ANSWER_MODULE ${BUILD_DIR}
 
@@ -32,8 +16,14 @@ ARG TAGS="sqlite sqlite_unlock_notify"
 ENV TAGS "bindata timetzdata $TAGS"
 ARG CGO_EXTRA_CFLAGS
 
+# === Ensure your forked code is used ===
 COPY . ${BUILD_DIR}
 WORKDIR ${BUILD_DIR}
+
+# Optional: Verification step to confirm local code use
+RUN echo "==== Folder Listing ====" && ls -la ${BUILD_DIR} \
+    && if [ -f "${BUILD_DIR}/test-fork.txt" ]; then cat ${BUILD_DIR}/test-fork.txt; fi
+
 RUN apk --no-cache add build-base git bash nodejs npm && npm install -g pnpm@9.7.0 \
     && make clean build
 
